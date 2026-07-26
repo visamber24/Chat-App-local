@@ -1,0 +1,8 @@
+ktor:
+  deployment:
+    port: 5005
+    host: 0.0.0.0
+  application:
+    modules:
+      - com.example.MainKt.module
+
