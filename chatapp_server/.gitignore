@@ -1,0 +1,13 @@
+# Gradle
+.gradle/
+build/
+
+# IntelliJ
+.idea/
+*.iml
+Dockerfile
+# Local
+local.properties
+
+# Logs
+*.log
