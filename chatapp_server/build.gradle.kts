@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(ktorLibs.plugins.ktor)
-    alias(ktorLibs.plugins.serialization)
+    alias(libs.plugins.serialization)
 }
 
 group = "com.example"
