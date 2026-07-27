@@ -4,5 +4,6 @@ ktor:
     host: 0.0.0.0
   application:
     modules:
+      -
       - com.example.MainKt.module
 
