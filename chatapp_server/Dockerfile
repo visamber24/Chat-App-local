@@ -1,16 +1,28 @@
-FROM eclipse-temurin:21-jre
+# ---------- Build Stage ----------
+FROM gradle:8.10.2-jdk21 AS builder
 
-# Working directory inside the container
 WORKDIR /app
 
-# Copy the fat jar
-COPY build/libs/*-all.jar app.jar
+# Copy the entire project
+        COPY . .
 
-# Cloud Run provides PORT=8080
+# Give execution permission to Gradle wrapper
+        RUN chmod +x gradlew
+
+# Build the fat JAR
+        RUN ./gradlew buildFatJar --no-daemon
+
+# ---------- Runtime Stage ----------
+FROM eclipse-temurin:21-jre
+
+WORKDIR /app
+
+# Copy the generated fat JAR
+COPY --from=builder /app/build/libs/*-all.jar app.jar
+
+# Render provides PORT automatically
 ENV PORT=8080
 
-# Expose the port
 EXPOSE 8080
 
-# Start the server
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java","-jar","app.jar"]
