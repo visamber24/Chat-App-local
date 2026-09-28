@@ -26,6 +26,7 @@ fun Route.chatSocket() {
             close(CloseReason(CloseReason.Codes.VIOLATED_POLICY, "No Session. "))
             return@webSocket
         }
+        println("DEBUG_WS: WebSocket connected")
 
         try {
             roomController.onJoin(
@@ -38,6 +39,8 @@ fun Route.chatSocket() {
                     roomController.sendMessage(
                         senderUsername = session.username,
                         message = frame.readText()
+                                println("DEBUG_WS: message received, length=${message.length}")
+
                     )
                 }
             }
@@ -46,6 +49,7 @@ fun Route.chatSocket() {
         } catch (e: Exception) {
             e.printStackTrace()
         } finally {
+            println("DEBUG_WS: sendMessage() finished")
             roomController.tryDisconnect(session.username)
         }
 

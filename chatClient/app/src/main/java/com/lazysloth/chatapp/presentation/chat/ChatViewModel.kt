@@ -55,7 +55,6 @@ class ChatViewModel(
         savedStateHandle.get<String>("username")?.let { username ->
             viewModelScope.launch {
                 messageService.getAllMessages()
-
                 messageService.saveMessagesToDatabase()
                 val result = chatSocketService.initSession(username)
                 Log.d("Socket", "socket no. $chatSocketService")

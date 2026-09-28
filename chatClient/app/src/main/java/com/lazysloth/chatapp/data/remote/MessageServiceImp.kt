@@ -37,11 +37,13 @@ class MessageServiceImp(
         }
     }
 
+
     @RequiresApi(Build.VERSION_CODES.O)
     override suspend fun saveMessagesToDatabase() {
         Log.d("DB", "1. saveMessagesToDatabase called")
-        val dbMsg = messageRepository.getLastMessage() ?: ""
-        if (latestMessages.last().id != dbMsg) {
+        val dbMsg = messageRepository.getLastMessage().orEmpty();
+        val latestMessage = latestMessages.lastOrNull() ?: return;
+        if (latestMessage.id != dbMsg) {
             Log.d("DB", "2. before repository insert")
             messageRepository.insert(latestMessages.map { it.toMessageDb() })
             Log.d("DB", "4. DAO insert finished")

@@ -1,6 +1,7 @@
 package com.lazysloth.chatapp.data
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import com.lazysloth.chatapp.data.dto.MessageDto
 import com.lazysloth.chatapp.data.remote.ChatSocketService
@@ -44,6 +45,7 @@ class ChatSocketServiceImpl(
 
     override suspend fun sendMessage(message: String, gif: Byte) {
         try {
+            Log.d("Socket success" ,"${Frame.Text(message)}");
             socket?.send(Frame.Text(message))
         } catch (e: Exception) {
             e.printStackTrace()
