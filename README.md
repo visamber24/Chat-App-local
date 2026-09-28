@@ -1,3 +1,4 @@
+## **Note:** * If you install the application directly wait for 2 - 3 minutes after opening the chat, because the MongoAtlast db server and render server takes time to start *
 # Chat App Local
 
 A real-time Android chat application built with **Kotlin**, **Jetpack Compose**, **Ktor**, **WebSockets**, and **MongoDB**.
