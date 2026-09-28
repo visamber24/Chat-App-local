@@ -39,9 +39,8 @@ fun Route.chatSocket() {
                     roomController.sendMessage(
                         senderUsername = session.username,
                         message = frame.readText()
-                                println("DEBUG_WS: message received, length=${message.length}")
-
                     )
+                    println("DEBUG_WS: message received, length=${frame.readText().length}")
                 }
             }
         } catch (e: MemberAlreadyExistsException) {
