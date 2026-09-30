@@ -1,6 +1,7 @@
 package com.lazysloth.chatapp.presentation.chat
 
 import android.os.Build
+import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
@@ -19,6 +20,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -97,6 +99,10 @@ fun ChatScreen(
             }
         }
         val state = viewModel.state.collectAsState().value
+//        LaunchedEffect(Unit) {
+//            Log.d("UI", "ChatScreen entered composition")
+//        }
+        Log.d("UI", "ChatScreen recomposed: ${state.messageUi}")
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -116,17 +122,20 @@ fun ChatScreen(
                     Spacer(modifier = Modifier.height(32.dp))
                 }
                 items(state.messageUi) { message ->
-                    when(state.messageType)
-                    {
-                        MessageType.Gif -> {
-                            AsyncImage(
-                                model = message.url,
-                                contentDescription = null
-                            )
-                        }
-                        MessageType.Text -> {}
-                        MessageType.Image -> {}
-                    }
+
+//                    when(state.messageType)
+//                    {
+//                        MessageType.Gif -> {
+//                            AsyncImage(
+//                                model = message.url,
+//                                contentDescription = null
+//                            )
+//                        }
+//                        MessageType.Text -> {
+//
+//                        }
+//                        MessageType.Image -> {}
+//                    }
                     val isOwnMessage = message.username == username
                     Box(
                         contentAlignment = if (isOwnMessage) Alignment.CenterEnd
@@ -218,7 +227,7 @@ fun ChatScreen(
                     containerColor = MaterialTheme.colorScheme.primary
                 )) {
                     Icon(
-                        imageVector = Icons.Default.Send, contentDescription = "Send message "
+                        imageVector = Icons.AutoMirrored.Filled.Send, contentDescription = "Send message "
                     )
                 }
             }

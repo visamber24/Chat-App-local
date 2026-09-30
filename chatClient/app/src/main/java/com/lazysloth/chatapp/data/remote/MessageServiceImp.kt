@@ -44,8 +44,12 @@ class MessageServiceImp(
         val dbMsg = messageRepository.getLastMessage().orEmpty();
         val latestMessage = latestMessages.lastOrNull() ?: return;
         if (latestMessage.id != dbMsg) {
-            Log.d("DB", "2. before repository insert")
-            messageRepository.insert(latestMessages.map { it.toMessageDb() })
+            Log.d("DB", "2. before repository insert. List \n ")
+
+            Log.d("DB", "2++. $latestMessages")
+            messageRepository.insert(latestMessages.map {
+                it.toMessageDb();
+            })
             Log.d("DB", "4. DAO insert finished")
         }
     }

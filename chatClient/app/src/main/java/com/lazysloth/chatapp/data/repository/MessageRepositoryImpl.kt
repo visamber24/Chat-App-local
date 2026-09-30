@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 
 class MessageRepositoryImpl(val messageDao: MessageDao): MessageRepository {
     override suspend fun insert(messageDb: List<MessageDb>) {
-        Log.d("DB", "3. repository insert called")
+        Log.d("DB", "3. repository insert called list is : \n $")
         messageDao.insertMessage(messageDb)
     }
 

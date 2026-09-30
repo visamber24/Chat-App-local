@@ -21,8 +21,12 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -57,19 +61,31 @@ class ChatViewModel(
                 messageService.getAllMessages()
                 messageService.saveMessagesToDatabase()
                 val result = chatSocketService.initSession(username)
-                Log.d("Socket", "socket no. $chatSocketService")
+                Log.d("Socket", "socket no. $chatSocketService" + "and result : $result")
                 when (result) {
                     is Resource.Success -> {
                         chatSocketService.observeMessages()
+                            .onStart {
+                                Log.d("Socket", "observeMessages collection STARTED")
+                            }
+                            .onEach { message ->
+                                Log.d("Socket", "Flow emitted: $message")
+                            }
+                            .catch { e ->
+                                Log.e("Socket", "observeMessages ERROR", e)
+                            }
+                            .onCompletion { cause ->
+                                Log.d("Socket", "observeMessages completed: $cause")
+                            }
                             .collect { newMessage ->
+                                Log.d("After Success", "$newMessage")
                                 _state.update { state ->
+                                    Log.d("ChatViewModel","${listOf(newMessage)}" )
                                     state.copy(
                                         messageUi = listOf(newMessage) + _state.value.messageUi,
                                         isLoading = false
                                     )
                                 }
-
-
                                 Log.d("Message", "formatted time : ${newMessage.formattedTime}")
                                 _messageText.value = ""
                             }
@@ -99,43 +115,40 @@ class ChatViewModel(
         }
     }
 
+    // Get messages from database
     @RequiresApi(Build.VERSION_CODES.O)
     fun getAllMessages() {
         Log.d("Messages", "getAllMessages called")
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
-            val result = messageRepository.getAllMessage()
+            messageRepository.getAllMessage()
                 .map { list ->
-                    list.map {
+                    list.map { message ->
                         val formatter = DateTimeFormatter.ofPattern("HH:mm dd/MM")
-                        val formattedDate = Instant.ofEpochMilli(it.timestamp)
-                            .atZone(ZoneId.systemDefault())
-                            .format(formatter)
+                        val formattedDate =
+                            Instant.ofEpochMilli(message.timestamp)
+                                .atZone(ZoneId.systemDefault())
+                                .format(formatter)
                         MessageUi(
-                            text = it.text,
-                            username = it.username,
+                            text = message.text,
+                            username = message.username,
                             formattedTime = formattedDate
                         )
                     }
+
+                }.flowOn(Dispatchers.Default)
+                .collect { messages ->
+                    Log.d(
+                        "From LocalDB",
+                        "Received ${messages.size}: $messages"
+                    )
+                    _state.update {
+                        it.copy(
+                            messageUi = messages,
+                            isLoading = false
+                        )
+                    }
                 }
-                .flowOn(Dispatchers.Default)
-                .stateIn(
-                    scope = viewModelScope,
-                    started = SharingStarted.WhileSubscribed(5000),
-                    initialValue = emptyList()
-                )
-
-
-            Log.d("Messages", "Received ${result.value} messages")
-//            result.forEach {
-//                Log.d("Messages", "${it.username}: ${it.text}")
-//            }
-            _state.update {
-                it.copy(
-                    messageUi = result.value,
-                    isLoading = false
-                )
-            }
         }
     }
 

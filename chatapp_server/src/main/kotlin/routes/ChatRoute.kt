@@ -40,11 +40,17 @@ fun Route.chatSocket() {
                         senderUsername = session.username,
                         message = frame.readText()
                     )
-                    println("DEBUG_WS: message received, length=${frame.readText().length}")
+                    val text = frame.readText()
+                    println("DEBUG_WS: message received, length=${text.length}")
                 }
             }
         } catch (e: MemberAlreadyExistsException) {
-            call.respond(HttpStatusCode.Conflict)
+            close(
+                CloseReason(
+                    CloseReason.Codes.CANNOT_ACCEPT,
+                    "Member already exists"
+                )
+            )
         } catch (e: Exception) {
             e.printStackTrace()
         } finally {
